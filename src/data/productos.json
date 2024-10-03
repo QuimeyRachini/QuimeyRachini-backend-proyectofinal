@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "title": "Fideos",
+        "description": "Marolio",
+        "code": "abc444",
+        "price": 1.500,
+        "img": "sin imagen",
+        "stock": 85
+    },
+    {
+        "id": 2,
+       "title": "Pure de Tomate",
+        "description": "Arcor",
+        "code": "pmr333",
+        "price": 800,
+        "img": "sin imagen",
+        "stock": 50
+    },
+    {
+        "id": 3,
+       "title": "Dulce de Leche",
+        "description": "Ilolay",
+        "code": "ouf678",
+        "price": 2.500,
+        "img": "sin imagen",
+        "stock": 100
+    },
+    {
+        "id": 4,
+        "title": "Gaseosa",
+        "description": "Pepsi",
+        "code": "jkl898",
+        "price": 1.200,
+        "img": "sin imagen",
+        "stock": 59
+    },
+    {
+        "id": 5,
+       "title": "Cafe",
+        "description": "Nestle",
+        "code": "loi243",
+        "price": 950,
+        "img": "sin imagen",
+        "stock": 8
+    },
+    {
+        "id": 6,
+       "title": "Alfajor",
+        "description": "Aguila",
+        "code": "kah978",
+        "price": 1000,
+        "img": "sin imagen",
+        "stock": 32
+    }
+]
