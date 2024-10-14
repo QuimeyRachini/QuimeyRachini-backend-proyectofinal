@@ -1,12 +1,14 @@
-import fs from "fs"; 
-
+import fs from "fs";
+import { fileURLToPath } from "url"; // Importar fileURLToPath
+import { dirname, join } from "path"; // Importar dirname y join para manejar rutas
 
 class CartManager {
-    constructor(path) {
-        this.path = path;
+    constructor(filePath) {
+        const __filename = fileURLToPath(import.meta.url); 
+        const __dirname = dirname(__filename); 
+        this.path = join(__dirname, '../data/carts.json');
         this.carts = [];
         this.ultId = 0;
-
         this.cargarCarritos();
     }
 
@@ -15,20 +17,17 @@ class CartManager {
             const data = await fs.promises.readFile(this.path, "utf-8");
             this.carts = JSON.parse(data);
             if (this.carts.length > 0) {
-            
                 this.ultId = Math.max(...this.carts.map(cart => cart.id));
-            
             }
         } catch (error) {
-            console.log("Error del sistema al cargar el carrito"); 
-            await this.guardarCarritos();
+            console.log("Error del sistema al cargar el carrito", error); 
+            await this.guardarCarritos(); // Crea el archivo si no existe
         }
     }
 
     async guardarCarritos() {
         await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, 2));
     }
-
 
     async crearCarrito() {
         const nuevoCarrito = {
@@ -68,11 +67,9 @@ class CartManager {
             carrito.products.push({ product: productoId, quantity });
         }
 
-
         await this.guardarCarritos();
         return carrito;
     }
-
 }
 
-export default CartManager; 
+export default CartManager;

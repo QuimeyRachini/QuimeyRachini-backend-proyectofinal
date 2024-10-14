@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos en Tiempo Real</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Enlazar el archivo CSS -->
+</head>
+<body>
+    <h1>Productos en Tiempo Real</h1>
+
+    <!-- Formulario para agregar nuevos productos -->
+    <form id="product-form">
+        <input type="text" id="name" placeholder="Título" required>
+        <input type="number" id="price" placeholder="Precio" required>
+        <input type="number" id="stock" placeholder="Stock" required>
+        <button type="submit">Crear</button>
+    </form>
+
+    <div class="contenedorCards" id="product-list">
+        <!-- Inicialmente aquí se cargan los productos enviados desde el servidor -->
+        {{#each productos}}
+        <div class="card">
+            <strong>{{this.title}}</strong>
+            <p>Descripción: {{this.description}}</p>
+            <p>Código: {{this.code}}</p>
+            <p>Precio: {{this.price}} ARS</p> <!-- Mostrar precio sin formatear -->
+            <p>Stock: {{this.stock}}</p>
+            <button onclick="deleteProduct('{{this.id}}')">Eliminar</button>
+            <button onclick="openEditForm('{{this.id}}', '{{this.title}}', {{this.price}}, {{this.stock}})">Editar</button>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Formulario para editar productos -->
+    <div id="edit-form" style="display: none;">
+        <h2>Editar Producto</h2>
+        <input type="hidden" id="product-id">
+        <label for="edit-title">Título:</label>
+        <input type="text" id="edit-title">
+        <br>
+        <label for="edit-price">Precio:</label>
+        <input type="number" id="edit-price">
+        <br>
+        <label for="edit-stock">Stock:</label>
+        <input type="number" id="edit-stock">
+        <br>
+        <button id="save-button">Guardar</button>
+        <button onclick="closeEditForm()">Cancelar</button>
+    </div>
+
+    <!-- Importar Socket.io -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <!-- Importar el archivo JS personalizado -->
+    <script src="/js/index.js"></script>
+</body>
+</html>
+

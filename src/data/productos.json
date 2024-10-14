@@ -1,56 +1,76 @@
 [
+  [
     {
-        "id": 1,
-        "title": "Fideos",
-        "description": "Marolio",
-        "code": "abc444",
-        "price": 1.500,
-        "img": "sin imagen",
-        "stock": 85
+      "id": 1,
+      "title": "Fideos",
+      "description": "Marolio",
+      "code": "abc444",
+      "price": 1.5,
+      "img": "sin imagen",
+      "stock": 85
     },
     {
-        "id": 2,
-       "title": "Pure de Tomate",
-        "description": "Arcor",
-        "code": "pmr333",
-        "price": 800,
-        "img": "sin imagen",
-        "stock": 50
+      "id": 2,
+      "title": "Pure de Tomate",
+      "description": "Arcor",
+      "code": "pmr333",
+      "price": 800,
+      "img": "sin imagen",
+      "stock": 50
     },
     {
-        "id": 3,
-       "title": "Dulce de Leche",
-        "description": "Ilolay",
-        "code": "ouf678",
-        "price": 2.500,
-        "img": "sin imagen",
-        "stock": 100
+      "id": 3,
+      "title": "Dulce de Leche",
+      "description": "Ilolay",
+      "code": "ouf678",
+      "price": 2.5,
+      "img": "sin imagen",
+      "stock": 100
     },
     {
-        "id": 4,
-        "title": "Gaseosa",
-        "description": "Pepsi",
-        "code": "jkl898",
-        "price": 1.200,
-        "img": "sin imagen",
-        "stock": 59
+      "id": 4,
+      "title": "Gaseosa",
+      "description": "Pepsi",
+      "code": "jkl898",
+      "price": 1.2,
+      "img": "sin imagen",
+      "stock": 59
     },
     {
-        "id": 5,
-       "title": "Cafe",
-        "description": "Nestle",
-        "code": "loi243",
-        "price": 950,
-        "img": "sin imagen",
-        "stock": 8
+      "id": 5,
+      "title": "Cafe",
+      "description": "Nestle",
+      "code": "loi243",
+      "price": 950,
+      "img": "sin imagen",
+      "stock": 8
     },
     {
-        "id": 6,
-       "title": "Alfajor",
-        "description": "Aguila",
-        "code": "kah978",
-        "price": 1000,
-        "img": "sin imagen",
-        "stock": 32
+      "id": 6,
+      "title": "Alfajor",
+      "description": "Aguila",
+      "code": "kah978",
+      "price": 1000,
+      "img": "sin imagen",
+      "stock": 32
     }
+  ],
+  {
+    "id": 7,
+    "title": "Mayonesa",
+    "description": "Fiesta",
+    "price": 700,
+    "img": "sin imagen",
+    "code": "prn991",
+    "stock": 100
+  },
+  {
+    "id": 8,
+    "title": "Manteca",
+    "description": "La serenisima",
+    "price": 3800,
+    "img": "sin imagen",
+    "code": "kjl992",
+    "stock": 190
+  }
 ]
