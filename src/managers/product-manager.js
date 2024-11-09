@@ -1,143 +1,102 @@
 import fs from "fs";
-import { fileURLToPath } from "url"; // Importar fileURLToPath
-import { dirname, join } from "path"; // Importar dirname y join para manejar rutas
+import { fileURLToPath } from "url"; 
+import { dirname, join } from "path"; 
 
 class ProductManager {
-    static ultId = 0;
+    static ultId = 0; // ID de último producto generado
 
     constructor(filePath) {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
-        this.path = join(__dirname, '../data/productos.json');
-        this.products = [];
-        this.cargarArray();
+        this.path = join(__dirname, '../data/productos.json'); // Ruta del archivo JSON
+        this.products = []; // Array de productos
+        this.cargarArray(); // Cargar productos desde el archivo
     }
 
     async cargarArray() {
         try {
+            // Si no existe el archivo, lo crea vacío
             if (!fs.existsSync(this.path)) {
-                await this.guardarArchivo([]); // Crea el archivo si no existe
+                await this.guardarArchivo([]);
             }
-            this.products = await this.leerArchivo();
+            // Leer el archivo y cargar productos
+            this.products = await this.leerArchivo(); 
             ProductManager.ultId = this.products.length > 0 
                 ? Math.max(...this.products.map(product => product.id)) 
-                : 0; // Establece el último ID usado
+                : 0;
         } catch (error) {
             console.log("Error del sistema al inicializar ProductManager", error);
         }
     }
 
-    async addProduct({ title, description, price, img, code, stock }) {
-        // Validar que todos los campos estén presentes
-        if (!title || !description || !price || !img || !code || !stock) {
-            throw new Error("Es necesario completar todos los campos");
-        }
-
-    if (isNaN(price) || isNaN(stock)) {
-        console.log("El precio y el stock deben ser números válidos.");
-        return;
-    }
-
-        // Validar que el código del producto sea único
-        if (this.products.some(item => item.code === code)) {
-            throw new Error("El código debe ser único");
-        }
-
-        // Crear el nuevo producto
-        const nuevoProducto = {
-            id: ++ProductManager.ultId,
-            title,
-            description,
-            price,
-            img,
-            code,
-            stock
-        };
-
-        this.products.push(nuevoProducto);
-        await this.guardarArchivo(this.products);
-        console.log("Producto agregado exitosamente");
-    }
-
-    async getProducts() {
+    // Método para obtener productos con filtrado, ordenamiento y paginación
+    async getProducts({ limit = 10, page = 1, sort = '', query = '', category = '', available = '' }) {
         try {
-            return await this.leerArchivo();
+            // Obtener todos los productos
+            const allProducts = await this.leerArchivo();
+
+            // Filtrado por nombre (query)
+            const filteredProducts = allProducts.filter(product => {
+                let matchesQuery = query ? product.title.toLowerCase().includes(query.toLowerCase()) : true;
+                let matchesCategory = category ? product.category && product.category.toLowerCase() === category.toLowerCase() : true;
+                let matchesAvailability = available ? product.stock > 0 : true;
+                return matchesQuery && matchesCategory && matchesAvailability;
+            });
+
+            // Ordenamiento por precio
+            const sortedProducts = sort.toLowerCase() === 'desc'
+                ? filteredProducts.sort((a, b) => b.price - a.price)
+                : filteredProducts.sort((a, b) => a.price - b.price);
+
+            // Paginación
+            const startIndex = (page - 1) * limit;
+            const paginatedProducts = sortedProducts.slice(startIndex, startIndex + limit);
+
+            // Resultado de paginación
+            return {
+                status: 'success',
+                payload: paginatedProducts, // Productos de la página actual
+                totalPages: Math.ceil(filteredProducts.length / limit), // Total de páginas
+                prevPage: page > 1 ? page - 1 : null, // Página anterior (si existe)
+                nextPage: page < Math.ceil(filteredProducts.length / limit) ? page + 1 : null, // Página siguiente (si existe)
+                page: page, // Página actual
+                hasPrevPage: page > 1, // Indicador de si hay página anterior
+                hasNextPage: page < Math.ceil(filteredProducts.length / limit), // Indicador de si hay página siguiente
+                prevLink: page > 1 ? `/api/products?page=${page - 1}&limit=${limit}&sort=${sort}&query=${query}&category=${category}&available=${available}` : null,
+                nextLink: page < Math.ceil(filteredProducts.length / limit) ? `/api/products?page=${page + 1}&limit=${limit}&sort=${sort}&query=${query}&category=${category}&available=${available}` : null,
+            };
         } catch (error) {
-            console.log("Error al leer el archivo", error);
-            return [];
+            console.log("Error al obtener productos", error);
+            return {
+                status: 'error',
+                message: "Error al obtener productos"
+            };
         }
     }
 
-    async getProductById(id) {
-        try {
-            const arrayProductos = await this.leerArchivo();
-            const buscado = arrayProductos.find(item => item.id === id);
-
-            if (!buscado) {
-                console.log("Producto no encontrado en el sistema");
-                return null;
-            } else {
-                console.log("Producto encontrado en el sistema");
-                return buscado;
-            }
-        } catch (error) {
-            console.log("Error al buscar por ID", error);
-        }
-    }
-
+    // Leer el archivo JSON
     async leerArchivo() {
         try {
-            const respuesta = await fs.promises.readFile(this.path, "utf-8");
-            return JSON.parse(respuesta);
+            const respuesta = await fs.promises.readFile(this.path, "utf-8"); 
+            return JSON.parse(respuesta); // Parsear el contenido del archivo JSON
         } catch (error) {
             console.log("Error al leer el archivo", error);
-            return [];
+            return []; // Devuelve un array vacío en caso de error
         }
     }
 
+    // Guardar el archivo JSON
     async guardarArchivo(arrayProductos) {
         try {
-            await fs.promises.writeFile(this.path, JSON.stringify(arrayProductos, null, 2));
+            await fs.promises.writeFile(this.path, JSON.stringify(arrayProductos, null, 2)); // Guardar productos en el archivo
         } catch (error) {
             console.log("Error al guardar el archivo", error);
-        }
-    }
-
-    async updateProduct(id, productoActualizado) {
-        try {
-            const arrayProductos = await this.leerArchivo();
-            const index = arrayProductos.findIndex(item => item.id === id);
-
-            if (index !== -1) {
-                arrayProductos[index] = { ...arrayProductos[index], ...productoActualizado };
-                await this.guardarArchivo(arrayProductos);
-                console.log("Producto actualizado en el sistema");
-            } else {
-                throw new Error("Producto no encontrado en el sistema");
-            }
-        } catch (error) {
-            console.log("Error al actualizar el producto en el sistema", error);
-        }
-    }
-
-    async deleteProduct(id) {
-        try {
-            const arrayProductos = await this.leerArchivo();
-            const index = arrayProductos.findIndex(item => item.id === id);
-
-            if (index !== -1) {
-                arrayProductos.splice(index, 1);
-                await this.guardarArchivo(arrayProductos);
-                console.log("Producto eliminado del sistema");
-            } else {
-                throw new Error("No se encuentra el producto en el sistema");
-            }
-        } catch (error) {
-            console.log("Error al eliminar el producto en el sistema", error);
         }
     }
 }
 
 export default ProductManager;
+
+
 
 

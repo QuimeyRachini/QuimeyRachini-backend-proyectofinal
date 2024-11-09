@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,23 +11,27 @@
 
     <!-- Formulario para agregar nuevos productos -->
     <form id="product-form">
-        <input type="text" id="name" placeholder="Título" required>
-        <input type="number" id="price" placeholder="Precio" required>
-        <input type="number" id="stock" placeholder="Stock" required>
+        <input type="text" id="title" placeholder="Título" required>
+        <input type="text" id="description" placeholder="Descripción" required>
+        <input type="text" id="code" placeholder="Código" required>
+        <input type="text" id="img" placeholder="URL de la Imagen" required>
+        <input type="number" id="price" placeholder="Precio" required min="0">
+        <input type="number" id="stock" placeholder="Stock" required min="0">
         <button type="submit">Crear</button>
     </form>
 
+    <!-- Contenedor donde se mostrarán los productos -->
     <div class="contenedorCards" id="product-list">
-        <!-- Inicialmente aquí se cargan los productos enviados desde el servidor -->
+        <!-- Los productos se agregarán aquí de manera dinámica -->
         {{#each productos}}
-        <div class="card">
+        <div class="card" id="product-{{this._id}}">
             <strong>{{this.title}}</strong>
             <p>Descripción: {{this.description}}</p>
             <p>Código: {{this.code}}</p>
-            <p>Precio: {{this.price}} ARS</p> <!-- Mostrar precio sin formatear -->
+            <p>Precio: {{this.price}} ARS</p> 
             <p>Stock: {{this.stock}}</p>
-            <button onclick="deleteProduct('{{this.id}}')">Eliminar</button>
-            <button onclick="openEditForm('{{this.id}}', '{{this.title}}', {{this.price}}, {{this.stock}})">Editar</button>
+            <button onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+            <button onclick="openEditForm('{{this._id}}', '{{this.title}}', {{this.price}}, {{this.stock}})">Editar</button>
         </div>
         {{/each}}
     </div>
@@ -39,11 +43,20 @@
         <label for="edit-title">Título:</label>
         <input type="text" id="edit-title">
         <br>
+        <label for="edit-description">Descripción:</label>
+        <input type="text" id="edit-description">
+        <br>
+        <label for="edit-code">Código:</label>
+        <input type="text" id="edit-code">
+        <br>
+        <label for="edit-img">URL de la Imagen:</label>
+        <input type="text" id="edit-img">
+        <br>
         <label for="edit-price">Precio:</label>
-        <input type="number" id="edit-price">
+        <input type="number" id="edit-price" min="0">
         <br>
         <label for="edit-stock">Stock:</label>
-        <input type="number" id="edit-stock">
+        <input type="number" id="edit-stock" min="0">
         <br>
         <button id="save-button">Guardar</button>
         <button onclick="closeEditForm()">Cancelar</button>
@@ -53,6 +66,74 @@
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
     <!-- Importar el archivo JS personalizado -->
     <script src="/js/index.js"></script>
+    <script>
+        const socket = io(); // Conexión con el servidor de WebSocket
+
+        // Enviar un nuevo producto al servidor
+        const productForm = document.getElementById('product-form');
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newProduct = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                code: document.getElementById('code').value,
+                img: document.getElementById('img').value,
+                price: document.getElementById('price').value,
+                stock: document.getElementById('stock').value
+            };
+
+            socket.emit('addProduct', newProduct); // Emitir evento para agregar producto
+
+            // Limpiar el formulario después de enviar
+            productForm.reset();
+        });
+
+        // Función para eliminar un producto
+        function deleteProduct(productId) {
+            socket.emit('deleteProduct', productId); // Emitir evento para eliminar producto
+        }
+
+        // Función para abrir el formulario de edición
+        function openEditForm(id, title, price, stock) {
+            document.getElementById('product-id').value = id;
+            document.getElementById('edit-title').value = title;
+            document.getElementById('edit-price').value = price;
+            document.getElementById('edit-stock').value = stock;
+            document.getElementById('edit-form').style.display = 'block';
+        }
+
+        // Función para cerrar el formulario de edición
+        function closeEditForm() {
+            document.getElementById('edit-form').style.display = 'none';
+        }
+
+        // Escuchar los eventos enviados desde el servidor para agregar o eliminar productos
+        socket.on('productAdded', (product) => {
+            const productList = document.getElementById('product-list');
+            const productElement = document.createElement('div');
+            productElement.classList.add('card');
+            productElement.id = `product-${product._id}`;
+            productElement.innerHTML = `
+                <strong>${product.title}</strong>
+                <p>Descripción: ${product.description}</p>
+                <p>Código: ${product.code}</p>
+                <p>Precio: ${product.price} ARS</p>
+                <p>Stock: ${product.stock}</p>
+                <button onclick="deleteProduct('${product._id}')">Eliminar</button>
+                <button onclick="openEditForm('${product._id}', '${product.title}', ${product.price}, ${product.stock})">Editar</button>
+            `;
+            productList.appendChild(productElement);
+        });
+
+        socket.on('productDeleted', (productId) => {
+            const productElement = document.getElementById(`product-${productId}`);
+            if (productElement) {
+                productElement.remove();
+            }
+        });
+    </script>
 </body>
 </html>
+
 

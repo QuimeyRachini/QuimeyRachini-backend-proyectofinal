@@ -6,7 +6,22 @@
             <p>{{this.description}}</p>
             <p>Precio: ${{this.price}}</p>
             <p>Stock: {{this.stock}}</p>
-            <button class="agregarCarrito" data-id="{{this.id}}">Agregar al carrito</button>
+            <!-- Botón para ver detalles del producto -->
+            <button class="verDetalles" onclick="window.location='/products/{{this._id}}'">Ver detalles</button>
+            <!-- Botón para agregar al carrito -->
+            <button class="agregarCarrito" data-id="{{this._id}}">Agregar al carrito</button>
         </div>
     {{/each}}
 </div>
+
+<!-- Paginación -->
+<div class="paginacion">
+    {{#if hasPrevPage}}
+        <a href="/products?limit={{limit}}&page={{prevPage}}&sort={{sort}}&query={{query}}">Página anterior</a>
+    {{/if}}
+
+    {{#if hasNextPage}}
+        <a href="/products?limit={{limit}}&page={{nextPage}}&sort={{sort}}&query={{query}}">Página siguiente</a>
+    {{/if}}
+</div>
+

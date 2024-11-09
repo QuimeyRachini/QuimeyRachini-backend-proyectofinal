@@ -1,26 +1,60 @@
-import express from "express"; 
+import express from "express";
 import ProductManager from "../managers/product-manager.js";
 
 const manager = new ProductManager("./src/data/productos.json");
 const router = express.Router();
 
-// Obtener productos con límite opcional
 router.get("/", async (req, res) => {
     try {
-        const limit = req.query.limit; 
-        const productos = await manager.getProducts(); 
+        const limit = parseInt(req.query.limit) || 10; 
+        const page = parseInt(req.query.page) || 1;     // Página actual
+        const sort = req.query.sort === 'asc' ? 1 : req.query.sort === 'desc' ? -1 : null;  // Orden ascendente o descendente por precio
+        const query = req.query.query; 
 
-        const numericLimit = limit ? parseInt(limit) : productos.length;
-        res.json(productos.slice(0, numericLimit)); 
+        // Obtener todos los productos
+        const productos = await manager.getProducts();
+
+        // Filtrar por categoría o disponibilidad
+        let filteredProducts = productos;
+        if (query) {
+            filteredProducts = productos.filter(product => 
+                product.category === query || 
+                (query === 'disponible' && product.stock > 0)
+            );
+        }
+
+        // Ordenar productos
+        if (sort) {
+            filteredProducts.sort((a, b) => (a.price - b.price) * sort);
+        }
+
+        // Paginación
+        const totalProducts = filteredProducts.length;
+        const totalPages = Math.ceil(totalProducts / limit);
+        const paginatedProducts = filteredProducts.slice((page - 1) * limit, page * limit);
+
+        // Respuesta con datos estructurados
+        res.json({
+            status: "success",
+            payload: paginatedProducts,
+            totalPages: totalPages,
+            prevPage: page > 1 ? page - 1 : null,
+            nextPage: page < totalPages ? page + 1 : null,
+            page: page,
+            hasPrevPage: page > 1,
+            hasNextPage: page < totalPages,
+            prevLink: page > 1 ? `/products?limit=${limit}&page=${page - 1}&sort=${req.query.sort}&query=${query}` : null,
+            nextLink: page < totalPages ? `/products?limit=${limit}&page=${page + 1}&sort=${req.query.sort}&query=${query}` : null,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error interno del sistema");
+        res.status(500).json({ status: "error", message: "Error interno del sistema" });
     }
 });
 
-// Obtener producto por ID
+// GET: Obtener producto por ID
 router.get("/:pid", async (req, res) => {
-    const id = parseInt(req.params.pid); 
+    const id = parseInt(req.params.pid);
 
     try {
         const productoBuscado = await manager.getProductById(id);
@@ -28,31 +62,31 @@ router.get("/:pid", async (req, res) => {
         if (!productoBuscado) {
             return res.status(404).json({ message: "Producto no se encuentra en el sistema" });
         }
-        res.json(productoBuscado); 
+        res.json(productoBuscado);
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error interno del sistema: " + error.message); 
+        res.status(500).json({ message: "Error interno del sistema", error: error.message });
     }
 });
 
-// Agregar nuevo producto
+// POST: Agregar un nuevo producto
 router.post("/", async (req, res) => {
-    const nuevoProducto = req.body; 
+    const nuevoProducto = req.body;
 
     if (!nuevoProducto.title || !nuevoProducto.price) {
-        return res.status(400).send("Faltan campos requeridos");
+        return res.status(400).json({ message: "Faltan campos requeridos" });
     }
 
     try {
-        await manager.addProduct(nuevoProducto); 
-        res.status(201).send("Producto agregado con éxito");
+        await manager.addProduct(nuevoProducto);
+        res.status(201).json({ message: "Producto agregado con éxito", product: nuevoProducto });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error interno del sistema: " + error.message); 
+        res.status(500).json({ message: "Error interno del sistema", error: error.message });
     }
 });
 
-// Actualizar producto
+// PUT: Actualizar un producto
 router.put("/:pid", async (req, res) => {
     const id = parseInt(req.params.pid);
     const productoActualizado = req.body;
@@ -61,28 +95,36 @@ router.put("/:pid", async (req, res) => {
         const productoExistente = await manager.getProductById(id);
 
         if (!productoExistente) {
-            return res.status(404).send("Producto no encontrado en el sistema");
-        } else {
-            await manager.updateProduct(id, productoActualizado);
-            res.status(200).send("Producto actualizado con éxito en el sistema");
+            return res.status(404).json({ message: "Producto no encontrado en el sistema" });
         }
+        
+        await manager.updateProduct(id, productoActualizado);
+        res.json({ message: "Producto actualizado con éxito", product: productoActualizado });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error interno del sistema: " + error.message);
+        res.status(500).json({ message: "Error interno del sistema", error: error.message });
     }
 });
 
-// Eliminar producto
+// DELETE: Eliminar un producto
 router.delete("/:pid", async (req, res) => {
-    const id = parseInt(req.params.pid); 
+    const id = parseInt(req.params.pid);
 
     try {
-        await manager.deleteProduct(id); 
-        res.send("Producto eliminado del sistema");
+        const productoEliminado = await manager.getProductById(id);
+        
+        if (!productoEliminado) {
+            return res.status(404).json({ message: "Producto no encontrado en el sistema" });
+        }
+        
+        await manager.deleteProduct(id);
+        res.json({ message: "Producto eliminado del sistema" });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error interno del servicio: " + error.message); 
+        res.status(500).json({ message: "Error interno del sistema", error: error.message });
     }
 });
 
-export default router; 
+export default router;
+
+

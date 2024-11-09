@@ -12,7 +12,7 @@ function renderProducts(productos) {
             <strong>${producto.title}</strong>
             <p>Precio: ${parseFloat(producto.price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</p> <!-- Formatear precio aquí -->
             <p>Stock: ${producto.stock}</p>
-             <p>Descripción: ${producto.description}</p> <!-- Agregar descripción -->
+            <p>Descripción: ${producto.description}</p> <!-- Agregar descripción -->
             <p>Código: ${producto.code}</p> <!-- Agregar código -->
             <button onclick="deleteProduct('${producto.id}')">Eliminar</button>
             <button onclick="editProduct('${producto.id}')">Editar</button>
@@ -44,11 +44,26 @@ const form = document.getElementById('product-form');
 form.addEventListener('submit', (event) => {
     event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
-    const name = document.getElementById('name').value;
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const code = document.getElementById('code').value;
+    const img = document.getElementById('img').value;
     const price = document.getElementById('price').value;
     const stock = document.getElementById('stock').value;
 
-    const newProduct = { title: name, price: parseFloat(price), stock: parseInt(stock) };
+    if (parseFloat(price) < 0 || parseInt(stock) < 0) {
+        alert('El precio y el stock no pueden ser negativos.');
+        return;
+    }
+
+    const newProduct = {
+        title: title,
+        description: description,
+        code: code,
+        img: img,
+        price: parseFloat(price),
+        stock: parseInt(stock)
+    };
 
     // Enviar el nuevo producto al servidor mediante POST
     fetch('/api/products', {
@@ -78,6 +93,9 @@ function editProduct(productId) {
         .then(product => {
             // Mostrar los valores actuales del producto en el formulario de edición
             document.getElementById('edit-title').value = product.title;
+            document.getElementById('edit-description').value = product.description;
+            document.getElementById('edit-code').value = product.code;
+            document.getElementById('edit-img').value = product.img;
             document.getElementById('edit-price').value = product.price;
             document.getElementById('edit-stock').value = product.stock;
 
@@ -95,9 +113,17 @@ document.getElementById('save-button').addEventListener('click', async () => {
     const productId = document.getElementById('product-id').value;
     const updatedProduct = {
         title: document.getElementById('edit-title').value,
+        description: document.getElementById('edit-description').value,
+        code: document.getElementById('edit-code').value,
+        img: document.getElementById('edit-img').value,
         price: parseFloat(document.getElementById('edit-price').value),
         stock: parseInt(document.getElementById('edit-stock').value)
     };
+
+    if (updatedProduct.price < 0 || updatedProduct.stock < 0) {
+        alert('El precio y el stock no pueden ser negativos.');
+        return;
+    }
 
     try {
         // Enviar la solicitud PUT para actualizar el producto
