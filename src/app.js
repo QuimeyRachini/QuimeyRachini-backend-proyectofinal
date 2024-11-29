@@ -6,12 +6,11 @@ import productsRouter from './routes/products.routes.js';
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter from "./routes/views.router.js";
 import CartManager from './managers/cart-manager.js';
-import ProductManager from './managers/product-manager.js';
+import ProductManager from './managers/ProductManager.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import "./database.js";
+import './database.js';
 
-// Obtener el directorio actual en ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -36,7 +35,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use("/", viewsRouter);
 
-// Datos iniciales de productos (ejemplo para la vista "home")
+// Datos iniciales de productos
 const initialProducts = [
     { title: "Fideos", description: "Marolio", code: "abc444", price: 1.5, img: "sin imagen", stock: 85 },
     { title: "Pure de Tomate", description: "Arcor", code: "pmr333", price: 800, img: "sin imagen", stock: 50 },

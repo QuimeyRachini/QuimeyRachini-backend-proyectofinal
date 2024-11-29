@@ -1,7 +1,7 @@
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import ProductManager from "./ProductManager.js";  // Asegúrate de importar el ProductManager para obtener productos completos
+import ProductManager from "./ProductManager.js"; 
 
 class CartManager {
     constructor() {
@@ -10,25 +10,25 @@ class CartManager {
         this.path = join(__dirname, "../data/carts.json");
         this.carts = [];
         this.ultId = 0;
-        this.productManager = new ProductManager();  // Instancia de ProductManager
-        this.cargarCarritos(); // Carga los carritos al iniciar el manager
+        this.productManager = new ProductManager();
+        this.cargarCarritos(); 
     }
 
-    // Cargar carritos desde el archivo
+    // Cargar carritos
     async cargarCarritos() {
         try {
             const data = await fs.promises.readFile(this.path, "utf-8");
             this.carts = JSON.parse(data);
             if (this.carts.length > 0) {
-                this.ultId = Math.max(...this.carts.map(cart => cart.id)); // Establece el último ID
+                this.ultId = Math.max(...this.carts.map(cart => cart.id)); 
             }
         } catch (error) {
             console.log("Error al cargar los carritos:", error);
-            await this.guardarCarritos(); // Si no existe el archivo, crea uno nuevo
+            await this.guardarCarritos(); 
         }
     }
 
-    // Guardar los carritos en el archivo JSON
+    // Guardar los carritos
     async guardarCarritos() {
         try {
             await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, 2));
@@ -45,7 +45,7 @@ class CartManager {
         };
 
         this.carts.push(nuevoCarrito);
-        await this.guardarCarritos(); // Guardar el carrito creado en el archivo
+        await this.guardarCarritos(); 
         return nuevoCarrito;
     }
 
@@ -67,7 +67,6 @@ class CartManager {
         }
     }
 
-    // Poblar los productos del carrito
     async populateProducts(carrito) {
         const productosCompletos = await Promise.all(
             carrito.products.map(async (item) => {

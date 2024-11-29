@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";  // Importamos el plugin para la paginación
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -15,7 +15,7 @@ const productSchema = new mongoose.Schema({
     required: true,  
   },
   img: {
-    type: String,  // URL de la imagen del producto (opcional)
+    type: String,  
   },
   code: {
     type: String,

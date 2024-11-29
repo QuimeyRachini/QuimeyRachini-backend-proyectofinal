@@ -1,5 +1,5 @@
 import express from "express";
-import ProductManager from "../managers/product-manager.js";
+import ProductManager from "../managers/ProductManager.js";
 
 const manager = new ProductManager("./src/data/productos.json");
 const router = express.Router();
@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10; 
         const page = parseInt(req.query.page) || 1;     // Página actual
-        const sort = req.query.sort === 'asc' ? 1 : req.query.sort === 'desc' ? -1 : null;  // Orden ascendente o descendente por precio
+        const sort = req.query.sort === 'asc' ? 1 : req.query.sort === 'desc' ? -1 : null;  // Orden por precio
         const query = req.query.query; 
 
         // Obtener todos los productos

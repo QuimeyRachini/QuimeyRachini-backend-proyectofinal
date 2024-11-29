@@ -99,7 +99,7 @@ function editProduct(productId) {
             document.getElementById('edit-price').value = product.price;
             document.getElementById('edit-stock').value = product.stock;
 
-            document.getElementById('product-id').value = productId; // Guardar el ID del producto que se está editando
+            document.getElementById('product-id').value = productId; // Guardar el ID del producto
             document.getElementById('edit-form').style.display = 'block'; // Mostrar el formulario de edición
         })
         .catch(error => {

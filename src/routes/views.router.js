@@ -21,13 +21,13 @@ router.get("/products", async (req, res) => {
         );
 
         res.render("home", {
-            productos: productos.docs,           // Los productos a mostrar en la vista
-            currentPage: productos.page,         // Página actual
-            totalPages: productos.totalPages,    // Total de páginas para la paginación
-            prevPage: productos.prevPage,        // Página anterior
-            nextPage: productos.nextPage,        // Página siguiente
-            limit: productos.limit,              // Límite de productos por página
-            query,                               // Filtro de búsqueda (query)
+            productos: productos.docs,
+            currentPage: productos.page,
+            totalPages: productos.totalPages,
+            prevPage: productos.prevPage,
+            nextPage: productos.nextPage,
+            limit: productos.limit,
+            query,
         });
     } catch (error) {
         res.status(500).send("Error al recuperar los productos");

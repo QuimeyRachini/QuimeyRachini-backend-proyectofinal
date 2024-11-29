@@ -1,7 +1,7 @@
 import express from "express";
 import CartManager from "../managers/cart-manager.js";
 const router = express.Router();
-const manager = new CartManager(); // Ya no es necesario pasar la ruta, ya la maneja el manager
+const manager = new CartManager();
 
 // Crear un nuevo carrito
 router.post("/", async (req, res) => {
@@ -22,7 +22,7 @@ router.get('/:cid', async (req, res) => {
         if (!carrito) {
             return res.status(404).json({ message: 'Carrito no encontrado' });
         }
-        res.json(carrito); // El carrito ya viene con los productos completos gracias a populate en el manager
+        res.json(carrito);
     } catch (error) {
         res.status(500).send("Error del sistema al obtener productos del carrito");
     }
